@@ -9,8 +9,8 @@
 var Readable = require('readable-stream').Readable;
 
 for(var Readable____Key in Readable){if(Readable.hasOwnProperty(Readable____Key)){BufferBody[Readable____Key]=Readable[Readable____Key];}}var ____SuperProtoOfReadable=Readable===null?null:Readable.prototype;BufferBody.prototype=Object.create(____SuperProtoOfReadable);BufferBody.prototype.constructor=BufferBody;BufferBody.__superConstructor__=Readable;
-  function BufferBody(buffer, opts) {
-    Readable.call(this,opts);
+  function BufferBody(buffer) {
+    Readable.call(this);
     this._buffer = buffer;
   }
 

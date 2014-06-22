@@ -12,6 +12,7 @@ import resolveDeep from 'resolve-deep';
 
 class JSONBody extends Readable {
   constructor(data) {
+    super();
     this._data = data;
     this._stringified = undefined;
   }

@@ -12,6 +12,7 @@ var resolveDeep = require('resolve-deep');
 
 for(var Readable____Key in Readable){if(Readable.hasOwnProperty(Readable____Key)){JSONBody[Readable____Key]=Readable[Readable____Key];}}var ____SuperProtoOfReadable=Readable===null?null:Readable.prototype;JSONBody.prototype=Object.create(____SuperProtoOfReadable);JSONBody.prototype.constructor=JSONBody;JSONBody.__superConstructor__=Readable;
   function JSONBody(data) {
+    Readable.call(this);
     this._data = data;
     this._stringified = undefined;
   }

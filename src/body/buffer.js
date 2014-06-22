@@ -9,8 +9,8 @@
 import {Readable} from 'readable-stream';
 
 class BufferBody extends Readable {
-  constructor(buffer, opts) {
-    super(opts);
+  constructor(buffer) {
+    super();
     this._buffer = buffer;
   }
 
