@@ -1,121 +1,93 @@
+/**
+ * We need to disallow munging private properties since _* are part of our
+ * interface with ReadableStream
+ *
+ * @preventMunge
+ */
 'use strict';
 
 var caseless = require('caseless');
-var mod$0 = require('bluebird');var all = mod$0.all;var resolve = mod$0.resolve;var join = mod$0.join;
-var mod$1 = require('lodash');var zipObject = mod$1.zipObject;var each = mod$1.each;var isObject = mod$1.isObject;
-var toStream = require('./body').toStream;
+var PassThrough = require('readable-stream').PassThrough;
 
-function toArray(value) {
-  return Array.isArray(value) ? value : [value];
-}
+for(var PassThrough____Key in PassThrough){if(PassThrough.hasOwnProperty(PassThrough____Key)){QuinnResponse[PassThrough____Key]=PassThrough[PassThrough____Key];}}var ____SuperProtoOfPassThrough=PassThrough===null?null:PassThrough.prototype;QuinnResponse.prototype=Object.create(____SuperProtoOfPassThrough);QuinnResponse.prototype.constructor=QuinnResponse;QuinnResponse.__superConstructor__=PassThrough;
+  function QuinnResponse(statusCode, headers) {
+    PassThrough.call(this);
 
-function concatHeaders(old, newValue) {
-  if (old === undefined) {
-    return toArray(newValue);
-  }
-  return toArray(old).concat(toArray(newValue));
-}
+    this.statusCode = statusCode;
+    var c = caseless.httpify(this, headers || {});
+    this.headers = c;
+    this.getHeader = function(name) {
+      return c.get(name);
+    };
 
-function resolvedHeaders(headers) {
-  var headerKeys = Object.keys(headers);
-  var values = headerKeys.map( function(key)  {return headers[key];} );
-  return all(values).then( function(resolvedValues) 
-    {return zipObject(headerKeys, resolvedValues);}
-  );
-}
+    this.on('pipe', this._onIncomingPipe.bind(this));
 
-
-  function QuinnResponse(props, isResolved) {
-    this.statusCode = props.statusCode || 200;
-    this.headers = caseless(props.headers || {});
-    this.body = props.body || null; // null === empty body
-
-    this.$QuinnResponse0 = !!isResolved;
+    this._cachedError = null;
   }
 
-  QuinnResponse.prototype.resolved=function() {
-    if (this.$QuinnResponse0) return resolve(this);
-    return this.resolvedBody().then( function(body)  {
-      if (!this.hasHeader('Content-Type'))
-        this.header('Content-Type', 'text/plain; charset=utf-8');
-
-      if (typeof body.getByteSize === 'function') {
-        this.header('Content-Length', body.getByteSize());
-      } else {
-        // TODO: Handle content-length for other kinds of streams..?
-      }
-
-      if (isObject(body.headers)) {
-        // TODO: Assume this is an attempt to pipe through in incoming response
-        // Important: exclude Host, Content-Length, and other dangerous headers
-      }
-
-      if (typeof body.path === 'string') {
-        // TODO: Try guessing Content-Type based on this property
-        // Idea by @mikeal:
-        // https://github.com/mikeal/response/blob/0bb9b978cd120d69c9369faf385b11c974ab35a5/index.js#L22
-      }
-
-      return resolvedHeaders(this.headers.dict).then(
-        function(headers)  {return new QuinnResponse({
-          statusCode: this.statusCode,
-          headers: headers,
-          body: body
-        }, true);}.bind(this)
-      );
-    }.bind(this));
-  };
-
-  QuinnResponse.prototype.resolvedBody=function() {
-    if (this.$QuinnResponse0) return resolve(this.body);
-    return resolve(this.body).then(toStream);
-  };
-
-  QuinnResponse.prototype.status=function(code) {
-    return this.statusCode = code, this;
-  };
-
-  QuinnResponse.prototype.toJSON=function() {
-    return this.resolvedBody().then(function(body)  {return body.toJSON();});
-  };
-
-  QuinnResponse.prototype.toBuffer=function() {
-    return this.resolvedBody().then(function(body)  {return body.toBuffer();});
-  };
-
-  QuinnResponse.prototype.pipe=function(res) {
-    if (!this.$QuinnResponse0) {
-      this.resolved().then( function(r)  {return r.pipe(res);} );
-    } else {
-      if (res.setHeader) {
-        res.statusCode = this.statusCode;
-        each(this.headers.dict, function(header, name)  {
-          res.setHeader(name, header);
-        });
-      }
-      this.body.pipe(res);
+  QuinnResponse.prototype._onIncomingPipe=function(src) {
+    if (src.path) {
+      // path can be used to automatically set content-type,
+      // worth preserving.
+      this.path = src.path;
     }
-    return res;
+    src.on('error', this.error.bind(this));
   };
 
-  QuinnResponse.prototype.hasHeader=function(name) {
-    return this.headers.has(name);
+  QuinnResponse.prototype.error=function(err) {
+    if (this._readableState.pipesCount > 0) {
+      this.emit('error', err);
+    } else {
+      this._cachedError = err;
+    }
   };
 
-  QuinnResponse.prototype.getHeader=function(name) {
-    return this.headers.get(name);
+  QuinnResponse.prototype._forwardMeta=function(dest) {
+    dest.statusCode = this.statusCode;
+
+    var headers = this.headers.dict;
+    var keys = Object.keys(headers);
+    var name, idx;
+
+    for (idx = 0; idx < keys.length; ++idx) {
+      name = keys[idx];
+      dest.setHeader(name, headers[name]);
+    }
   };
 
-  QuinnResponse.prototype.header=function(name, value) {
-    if (value === undefined)
-      return this.headers.del(name), this;
-    else
-      return this.headers.set(name, value), this;
+  QuinnResponse.prototype.wrappedPipe=function(dest, options) {
+    // this -> dest -> wrapped
+    var wrapped = new QuinnResponse(this.statusCode, this.headers.dict);
+    wrapped._onIncomingPipe(this);
+    return PassThrough.prototype.pipe.call(this, dest, options)
+      .pipe(wrapped, options);
   };
 
-  QuinnResponse.prototype.addHeader=function(name, value) {
-    var oldValue = this.headers.get(name);
-    this.headers.set(name, join(oldValue, value, concatHeaders));
+  QuinnResponse.prototype.pipe=function(dest, options) {
+    if (this._cachedError !== null) {
+      setImmediate(this.emit.bind(this, 'error', this._cachedError));
+      this._cachedError = null;
+    }
+
+    if (dest) {
+      if (typeof dest.setHeader === 'function') {
+        this._forwardMeta(dest);
+      } else if (typeof dest.pipe === 'function') {
+        // rewrap so the util methods is properly preserved
+        return this.wrappedPipe(dest, options);
+      }
+    }
+
+    return PassThrough.prototype.pipe.call(this, dest, options);
+  };
+
+  QuinnResponse.prototype.status=function(statusCode) {
+    this.statusCode = statusCode;
+    return this;
+  };
+
+  QuinnResponse.prototype.header=function() {
+    this.setHeader.apply(this, arguments);
     return this;
   };
 
