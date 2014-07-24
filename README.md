@@ -42,3 +42,8 @@ If no body is provided, it defaults to a through stream.
 Create `text/html` response with the given body.
 The body can be a string or a buffer.
 If no body is provided, it defaults to a through stream.
+
+#### `respond.json(data)`
+
+Serialize the data and create an `application/json` response.
+If no data is provided, it defaults to a through stream.
