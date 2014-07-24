@@ -73,7 +73,7 @@ for(var PassThrough____Key in PassThrough){if(PassThrough.hasOwnProperty(PassThr
       if (typeof dest.setHeader === 'function') {
         this._forwardMeta(dest);
       } else if (typeof dest.pipe === 'function') {
-        // rewrap so the util methods is properly preserved
+        // rewrap so the util methods are properly preserved
         return this.wrappedPipe(dest, options);
       }
     }
