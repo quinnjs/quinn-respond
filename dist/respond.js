@@ -5,7 +5,7 @@ var QuinnResponse = require('./response');
 function respond(options) {
   options = options || {};
 
-  if (options instanceof QuinnResponse)
+  if (options instanceof QuinnResponse || options.quinnResVersion === 2)
     return options;
 
   var headers, statusCode, body;

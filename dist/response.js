@@ -92,4 +92,6 @@ for(var PassThrough____Key in PassThrough){if(PassThrough.hasOwnProperty(PassThr
   };
 
 
+QuinnResponse.prototype.quinnResVersion = 2;
+
 module.exports = QuinnResponse;

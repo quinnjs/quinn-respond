@@ -5,7 +5,7 @@ import QuinnResponse from './response';
 function respond(options) {
   options = options || {};
 
-  if (options instanceof QuinnResponse)
+  if (options instanceof QuinnResponse || options.quinnResVersion === 2)
     return options;
 
   var headers, statusCode, body;

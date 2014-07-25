@@ -92,4 +92,6 @@ class QuinnResponse extends PassThrough {
   }
 }
 
+QuinnResponse.prototype.quinnResVersion = 2;
+
 export default QuinnResponse;
