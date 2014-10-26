@@ -12,6 +12,14 @@ See the test directory for usage examples.
 
 ### QuinnResponse
 
+#### `.status(code)`
+
+Chainable way to modify `res.statusCode`.
+
+#### `.header(name, value)`
+
+Chainable alternative to `.setHeader`.
+
 #### `.pipe(res)`
 
 Forward response to node http response.
