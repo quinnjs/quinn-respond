@@ -1,6 +1,6 @@
 {
   "name": "quinn-respond",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": "Response generation for quinn",
   "main": "lib/respond.js",
   "scripts": {
