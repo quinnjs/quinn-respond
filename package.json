@@ -2,9 +2,9 @@
   "name": "quinn-respond",
   "version": "3.1.1",
   "description": "Response generation for quinn",
-  "main": "lib/respond.js",
+  "main": "respond.js",
   "scripts": {
-    "test": "jshint lib test && mocha"
+    "test": "jshint respond.js response.js test && mocha"
   },
   "repository": {
     "type": "git",

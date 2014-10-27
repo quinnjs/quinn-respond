@@ -120,42 +120,7 @@ QuinnResponse.isResponse = function(obj) {
     obj._qv === 3;
 };
 
-function respond(options) {
-  options = options || {};
+QuinnResponse.isBody = isBody;
 
-  if (QuinnResponse.isResponse(options)) {
-    return options;
-  }
-
-  if (isBody(options)) {
-    options = { body: options };
-  }
-
-  var statusCode = options.statusCode;
-  var headers = options.headers;
-  var body = options.body;
-
-  return new QuinnResponse(statusCode, headers, body);
-}
-
-function text(options) {
-  return respond(options)
-    .header('Content-Type', 'text/plain; charset=utf-8');
-}
-respond.text = text;
-
-function html(options) {
-  return respond(options)
-    .header('Content-Type', 'text/html; charset=utf-8');
-}
-respond.html = html;
-
-function json(data, visitor, indent) {
-  return respond().json(data, visitor, indent);
-}
-respond.json = json;
-
-respond.Response = QuinnResponse;
-respond['default'] = respond;
-
-module.exports = respond;
+module.exports = QuinnResponse;
+module.exports['default'] = QuinnResponse;
