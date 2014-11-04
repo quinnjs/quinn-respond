@@ -30,11 +30,12 @@ function bodyToStream(body) {
   return body;
 }
 
-function QuinnResponse(statusCode, headers, body) {
+function QuinnResponse(statusCode, headers, body, data) {
   this.statusCode = statusCode || 200;
   var c = caseless.httpify(this, headers || {});
   this._headers = c;
   this.body(body);
+  this._data = data;
 }
 
 QuinnResponse.prototype.header =
@@ -47,6 +48,11 @@ QuinnResponse.prototype.status =
 function setStatus(code) {
   this.statusCode = code;
   return this;
+};
+
+QuinnResponse.prototype.getData =
+function getData() {
+  return this._data;
 };
 
 QuinnResponse.prototype.body =
@@ -85,6 +91,7 @@ QuinnResponse.prototype.html = function(body) {
 };
 
 QuinnResponse.prototype.json = function(data, visitor, indent) {
+  this._data = data;
   return this.body(JSON.stringify(data, visitor, indent))
     .header('Content-Type', 'application/json; charset=utf-8');
 };

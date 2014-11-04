@@ -101,5 +101,11 @@ describe('Content type helpers', function() {
         assert.equal('12', res.headers['content-length']);
       }).nodeify(done);
     });
+
+    it('data', function() {
+      var data = { x: 2 };
+      var res = respond().json(data);
+      assert.equal(data, res.getData());
+    });
   });
 });

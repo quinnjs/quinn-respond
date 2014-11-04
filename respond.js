@@ -17,8 +17,9 @@ function respond(options) {
   var statusCode = options.statusCode;
   var headers = options.headers;
   var body = options.body;
+  var data = options.data || {};
 
-  return new QuinnResponse(statusCode, headers, body);
+  return new QuinnResponse(statusCode, headers, body, data);
 }
 
 function text(options) {
